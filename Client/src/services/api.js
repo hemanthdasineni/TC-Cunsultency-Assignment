@@ -1,4 +1,5 @@
-const BASE_URL = "http://localhost:5000";
+// This tells your React app to talk to the cloud instead of your computer
+const BASE_URL = "https://tc-cunsultency-assignment.onrender.com";
 
 export const uploadResume = async (resumeText) => {
   const res = await fetch(`${BASE_URL}/api/resume/upload`, {
