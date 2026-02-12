@@ -33,7 +33,7 @@ app.register(resumeRoutes, { prefix: "/api/resume" });
 // Start server
 const start = async () => {
   try {
-    await app.listen({ port: 5000 });
+    await app.listen({ port: process.env.port });
     console.log("Server running on http://localhost:5000");
   } catch (err) {
     app.log.error(err);
