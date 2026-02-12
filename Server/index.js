@@ -1,4 +1,4 @@
-// import Fastify from "fastify";
+import Fastify from "fastify";
 import dotenv from "dotenv";
 import aiRoutes from "./routes/ai.routes.js";
 import jobsRoutes from "./routes/jobs.routes.js";
@@ -47,3 +47,4 @@ const start = async () => {
 
 // Execute the start function
 start();
+
