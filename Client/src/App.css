@@ -112,10 +112,12 @@
 
 h1 {
   margin-bottom: 20px;
+  color:aqua
 }
 
 h2 {
   margin-top: 30px;
+  color :aqua
 }
 .popup {
   position: fixed;
