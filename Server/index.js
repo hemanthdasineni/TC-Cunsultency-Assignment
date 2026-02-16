@@ -32,7 +32,7 @@ const start = async () => {
 
     // 4. Start listening
     // Note: port uses uppercase PORT for Render compatibility
-    const port = process.env.PORT || 10000;
+    const port = process.env.port|| 5000;
     const address = await app.listen({ 
       port: port, 
       host: '0.0.0.0' 

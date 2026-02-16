@@ -1,14 +1,40 @@
-import { askGemini } from "../services/gemini.services.js";
+import Groq from "groq-sdk";
+import dotenv from "dotenv";
 
-export const assistantRouter = async (message) => {
+dotenv.config();
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
+
+/**
+ * Safely extract JSON from AI response
+ */
+const extractJSON = (text) => {
+  const firstBrace = text.indexOf("{");
+  const lastBrace = text.lastIndexOf("}");
+
+  if (firstBrace === -1 || lastBrace === -1) {
+    throw new Error("No JSON object found in AI response");
+  }
+
+  const jsonString = text.substring(firstBrace, lastBrace + 1);
+
+  return JSON.parse(jsonString);
+};
+;
+
+export const runAssistant = async (message) => {
   try {
     const prompt = `
-You are an AI assistant inside a job tracker app.
+You are a job assistant.
 
-User message:
-"${message}"
+Respond ONLY in valid JSON.
+Do NOT include explanations.
+Do NOT include markdown.
+Do NOT include extra text.
 
-Return ONLY JSON:
+Return this exact format:
 
 {
   "intent": "search | filter | help",
@@ -17,27 +43,44 @@ Return ONLY JSON:
     "fulltime": boolean,
     "highMatch": boolean
   },
-  "reply": "short helpful message"
+  "reply": "string"
 }
+
+User message:
+${message}
 `;
 
-    const response = await askGemini(prompt);
+    const completion = await groq.chat.completions.create({
+      messages: [
+        { role: "system", content: "You respond ONLY with JSON." },
+        { role: "user", content: prompt }
+      ],
+      model: "llama-3.1-8b-instant",
+      temperature: 0
+      // ❌ removed response_format
+    });
 
-    // ⭐ SAFE JSON EXTRACTION
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    const rawResponse = completion.choices[0].message.content;
 
-    if (!jsonMatch) {
-      throw new Error("No JSON found");
-    }
+    console.log("AI RAW RESPONSE:", rawResponse);
 
-    return JSON.parse(jsonMatch[0]);
+    const parsed = extractJSON(rawResponse);
+
+    console.log("AI PARSED RESULT:", parsed);
+
+    return parsed;
+
   } catch (error) {
-    console.error("Assistant graph error:", error);
+    console.error("🔥 FULL ERROR:", error);
 
     return {
       intent: "help",
-      filters: {},
-      reply: "Sorry, I couldn't understand that.",
+      filters: {
+        remote: false,
+        fulltime: false,
+        highMatch: false
+      },
+      reply: "Something went wrong. Please try again."
     };
   }
 };

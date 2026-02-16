@@ -1,4 +1,4 @@
-import { assistantRouter } from "../langgraph/assistant.graph.js";
+import { runAssistant} from "../langgraph/assistant.graph.js";
 import { runJobPipeline } from "../services/jobPipeline.service.js";
 
 export default async function aiRoutes(fastify) {
@@ -12,7 +12,7 @@ export default async function aiRoutes(fastify) {
       }
 
       // 1️⃣ Ask AI
-      const aiResult = await assistantRouter(message);
+      const aiResult = await runAssistant(message);
 
       console.log("AI RESULT:", aiResult);   // ⭐ Debug
 
