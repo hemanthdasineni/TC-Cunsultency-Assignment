@@ -12,10 +12,8 @@ export default function Dashboard() {
   console.log("DATA FROM AI:", data);
 
   useEffect(() => {
-
   const checkPopup = () => {
     const saved = localStorage.getItem("lastAppliedJob");
-
     if (saved) {
       const job = JSON.parse(saved);
       setAppliedJob(job);
@@ -23,21 +21,27 @@ export default function Dashboard() {
     }
   };
 
-  // Run once on mount
-  checkPopup();
-
-  // ⭐ Detect when user switches back to this tab
-  document.addEventListener("visibilitychange", () => {
+  const handleVisibilityChange = () => {
     if (document.visibilityState === "visible") {
       checkPopup();
     }
-  });
+  };
 
+  // Run on mount
+  checkPopup();
+
+  // Add listener
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  // Cleanup (VERY IMPORTANT)
+  return () => {
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  };
 }, []);
 
   return (
     <div className="container">
-      <h1>AI Job Tracker</h1>
+      <h1 >AI Job Tracker</h1>
 
       <ResumeUpload />
       <ChatAssistant onResult={setData} />
@@ -47,7 +51,7 @@ export default function Dashboard() {
      {data?.jobs?.length > 0 && (
 
         <>
-          <h2>All Jobs</h2>
+          <h2 >All Jobs</h2>
           {data.jobs.map((job) => (
             <JobCard
               key={job.id}
